@@ -1,0 +1,28 @@
+# Versión de Docker Compose
+version: '2'
+services:
+  jenkins:
+    # Con el build decimos que haga uso de la imagen que se construirá con el Dockerfile de este directorio
+    build: .
+    # Exponemos el puerto 49001 en nuestra máquina local para poder ver la interfaz de Jenkins
+    ports:
+      - "49001:8080"
+    # Incluimos un volumen de datos en el directorio actual bajo la carpeta jenkins
+    volumes:
+      - ./jenkins:/var/jenkins_home
+  # Contenedor de Selenium Grid
+  selenium-hub:
+    image: selenium/hub:3.6.0
+    # Exponemos el puerto para comprobar la configuración de Selenium Hub
+    ports:
+      - "49002:4444"
+  # Contenedor de Chrome
+  chrome:
+    image: selenium/node-chrome:3.6.0
+    # Inlcuimos links para conectar el contendor de Chrome al Hub
+    links:
+      - selenium-hub:hub
+    # Variables de entorno necesarias
+    environment:
+      - HUB_PORT_4444_TCP_ADDR=hub
+      - HUB_PORT_4444_TCP_PORT=4444
